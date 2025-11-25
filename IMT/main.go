@@ -9,14 +9,22 @@ import (
 const imtPower = 2
 
 func main () {
+	
+	defer func(){
+		if r:=recover(); r!=nil{
+			fmt.Println("Recover",r)
+		}
+	}()
+
 	fmt.Println("Welcome to IMT calc")
 	for {
 		fmt.Println("Insert your height and weight")
 		userHeight, userWeight := getUserInput()
 		imt, err := calculateImt(userHeight,userWeight)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			// fmt.Println(err)
+			// continue
+			panic(err)
 		}
 		outputResult(imt)
 		
