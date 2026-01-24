@@ -1,0 +1,122 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+const (
+	USDToEUR = 0.93
+	USDToRUB = 92.54
+	EURToRUB = USDToRUB / USDToEUR
+)
+
+func main() {
+	fmt.Println("конвертер валют")
+	//получили входные данные
+	fromCurrency, amount, toCurrency := getUserInput()
+	//посчитали результат
+	result := convertCurrency(amount, fromCurrency, toCurrency)
+	//вывели результат
+	fmt.Printf("результат: %.2f %s = %.2f %s\n", amount, fromCurrency, result, toCurrency)
+}
+
+func getUserInput() (string, float64, string) {
+
+	fromCurrency := getCurrencyInput("Введите исходную валюту (USD, EUR, RUB): ")
+	
+	amount := getAmountInput()
+	
+	toCurrency := getCurrencyInput("Введите целевую валюту (USD, EUR, RUB): ")
+	
+	return fromCurrency, amount, toCurrency
+}
+// функция валюты используется дважды - промт позволяет изменить сообщение
+func getCurrencyInput(prompt string) string {
+	var currency string
+	validCurrencies := []string{"USD", "EUR", "RUB"}
+	//цикл проверки ввода
+	for {
+		//сообщение для пользователя
+		fmt.Print(prompt)
+		_, err := fmt.Scan(&currency)
+		currency = strings.ToUpper(currency)
+		
+		if err != nil {
+			fmt.Println("Ошибка ввода, попробуйте снова")
+			continue
+		}
+		//проверка списка валют
+		if !isValidCurrency(currency, validCurrencies) {
+			fmt.Println("Неверная валюта! Допустимые значения: USD, EUR, RUB")
+			continue
+		}
+		
+		break
+	}
+	
+	return currency
+}
+//проверка ввода имени волюты по списку
+func isValidCurrency(currency string, valid []string) bool {
+	for _, v := range valid {
+		if currency == v {
+			return true
+		}
+	}
+	return false
+}
+
+
+func getAmountInput() float64 {
+	var amount float64
+	
+	for {
+		fmt.Print("Введите сумму: ")
+		_, err := fmt.Scan(&amount)
+		
+		if err != nil || amount <= 0 {
+			fmt.Println("Ошибка! Введите положительное число")
+			continue
+		}
+		
+		break
+	}
+	
+	return amount
+}
+
+func convertCurrency(amount float64, fromCurrency string, toCurrency string) float64 {
+
+	if fromCurrency == toCurrency {
+		return amount
+	}
+
+	var result float64
+
+	switch fromCurrency {
+	case "USD":
+		switch toCurrency {
+		case "EUR":
+			result = amount * USDToEUR
+		case "RUB":
+			result = amount * USDToRUB
+		}
+	case "EUR":
+		switch toCurrency {
+		case "USD":
+			result = amount / USDToEUR
+		case "RUB":
+			result = amount * EURToRUB
+		}
+	case "RUB":
+		switch toCurrency {
+		case "USD":
+			result = amount / USDToRUB
+		case "EUR":
+			result = amount / EURToRUB
+		}
+	}
+
+	return result
+}
